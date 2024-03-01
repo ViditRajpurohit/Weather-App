@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="main.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <title>Document</title>
+  </head>
+  <body class="flex justify-end">
+    <!-- <img src="sun.jpeg" class="w-[100vw] h-[100vh] absolute" alt="" /> -->
+    <video
+      autoplay
+      loop
+      class="absolute top-0 left-0 w-full h-full object-cover z-0"
+      src="sunrise-video.mp4"
+    ></video>
+    <!--  div conating  items not in blur tab -->
+
+    <div id="tab1" class="h-[100vh] w-[70vw] pt-3 pr-4 backdrop-blur-none">
+      <!-- contains nav bar including sunrise/sunset and date -->
+      <nav class="flex justify-between">
+        <!-- div which making sunrise/sunset time in column -->
+        <div class="flex flex-col">
+          <!-- sunrise time -->
+
+          <div id="sunriseTimeDiv" class="hidden">
+            <img class="w-[3vw] h-[6vh]" src="sunrise-unscreen.gif" />
+            <button
+              id="sunriseTimeBtn"
+              class="text-white text-xl font-mono h-auto w-auto"
+            ></button>
+          </div>
+
+          <!-- sunset time -->
+
+          <div id="sunsetTimeDiv" class="hidden">
+            <img class="w-[3vw] h-[6vh]" src="sunset-unscreen.gif" />
+            <button
+              id="sunsetTimeBtn"
+              class="text-white text-xl font-mono h-auto w-auto"
+            ></button>
+          </div>
+        </div>
+
+        <!-- date and time button -->
+        <button
+          id="dateTimeBtn"
+          class="text-white text-xl h-auto w-auto font-serif"
+        ></button>
+      </nav>
+
+      <p
+        id="conditionPara"
+        class="ml-[18vw] absolute bottom-16 text-5xl z-10 w-[70%] text-end bg-gradient-to-b from-white via-slate-200 to-slate-400 text-transparent bg-clip-text"
+      ></p>
+    </div>
+
+    <!-- open tab button -->
+
+    <button
+      onclick="setIsOpen()"
+      id="openTabBtn"
+      class="text-white z-20 fixed right-0 opacity-0 top-[50%] text-2xl"
+    >
+      <i class="ri-arrow-left-s-line"></i>
+    </button>
+
+    <!-- weather condition -->
+
+    <!-- div conataning items in  blur tab in right  -->
+    <div
+      id="tab2"
+      class="bg-opacity-50 backdrop-blur-lg h-[100vh] w-[30vw] pt-10"
+    >
+      <!-- search bar -->
+      <div class="flex justify-center w-auto">
+        <form class="border h-[7vh] w-[22vw]">
+          <i class="ri-map-pin-line px-2 text-white"></i>
+          <input
+            id="inputByUser"
+            type="text"
+            class="bg-transparent h-[7vh] w-[15vw]"
+          />
+          <button id="searchBtn" class="text-white border-l pl-3">
+            <i class="ri-search-line"></i>
+          </button>
+        </form>
+      </div>
+
+      <p
+        id="searchWheatherDetailsPara"
+        class="text-white text-[3vw] flex justify-center font-mono mt-10"
+      ></p>
+
+      <!-- Extra details  -->
+
+      <div class="flex mt-6 ml-8 gap-4 h-[3vh]">
+        <!-- wind div -->
+
+        <div id="windDetails" class="hidden gap-1">
+          <img
+            class="w-[3vw] h-[5vh] bg-white rounded-full p-1"
+            src="windy-unscreen.gif"
+          />
+          <p id="windPara" class="text-white text-[12px]"></p>
+        </div>
+
+        <!-- humidity div -->
+
+        <div id="humidityDetails" class="hidden gap-1">
+          <img class="w-[3vw] h-[5vh] rounded-full" src="humidity.gif" />
+          <p id="humidityPara" class="text-white text-[12px]"></p>
+        </div>
+
+        <!-- air pressure div -->
+
+        <div id="pressureDetails" class="hidden gap-1">
+          <img
+            class="w-[3vw] h-[5vh] bg-white rounded-full p-1"
+            src="pressure-unscreen.gif"
+          />
+          <p id="pressurePara" class="text-white text-[12px]"></p>
+        </div>
+      </div>
+
+      <!-- border bottom  -->
+
+      <div class="bg-white w-3/4 h-[1px] ml-12 mt-16"></div>
+
+      <!-- close tab button -->
+
+      <button
+        onclick="setIsOpen()"
+        id="closeTabBtn"
+        class="text-white text-2xl"
+      >
+        <i class="ri-arrow-right-s-line"></i>
+      </button>
+    </div>
+
+    <script>
+      let dateTimeBtn = document.querySelector("#dateTimeBtn");
+      let openTabBtn = document.querySelector("#openTabBtn");
+      let closeTabBtn = document.querySelector("#closeTabBtn");
+      let tab1 = document.querySelector("#tab1");
+      let tab2 = document.querySelector("#tab2");
+      let inputByUser = document.querySelector("#inputByUser");
+      let searchBtn = document.querySelector("#searchBtn");
+      let searchWheatherDetailsPara = document.querySelector(
+        "#searchWheatherDetailsPara"
+      );
+      let sunriseBtn = document.querySelector("#sunriseTimeBtn");
+      let sunriseTimeDiv = document.querySelector("#sunriseTimeDiv");
+
+      let sunsetTimeBtn = document.querySelector("#sunsetTimeBtn");
+      let sunsetTimeDiv = document.querySelector("#sunsetTimeDiv");
+
+      let windDetails = document.querySelector("#windDetails");
+      let humidityPara = document.querySelector("#humidityPara");
+      let humidityDetails = document.querySelector("#humidityDetails");
+      let windPara = document.querySelector("#windPara");
+      let pressurePara = document.querySelector("#pressurePara");
+      let pressureDetails = document.querySelector("#pressureDetails");
+      let conditionPara = document.querySelector("#conditionPara");
+
+      //Setting open and close tab functionality
+      let isOpen = true;
+
+      function setIsOpen() {
+        if (isOpen === true) {
+          isOpen = false;
+          tab2.style.display = "none";
+          tab1.style.width = "100vw";
+
+          openTabBtn.style.opacity = "1";
+        } else {
+          isOpen = true;
+          tab2.style.display = "block";
+          tab1.style.width = "70vw";
+
+          openTabBtn.style.opacity = "0";
+        }
+      }
+
+      function updateDateTime() {
+        let currentDate = new Date();
+        let date = currentDate.getDate();
+        let month = currentDate.toLocaleString("default", { month: "long" });
+        let year = currentDate.getFullYear();
+        let hours = currentDate.getHours();
+
+        //setting 24hour to 12 hour format
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        let ampm = hours > 12 ? "PM" : "AM";
+        let minutes = currentDate.getMinutes();
+        minutes = ("0" + minutes).slice(-2);
+
+        let wholeData = `${date} ${month} ${year} | ${hours}:${minutes} ${ampm}`;
+        dateTimeBtn.textContent = wholeData; // Update button text content
+      }
+
+      updateDateTime();
+
+      // Set interval to update the date and time every 60 seconds
+      let liveTimings = setInterval(updateDateTime, 60000);
+
+      // fetching  API results
+
+      let fetchDetails = async function fetchWheatherDetails() {
+        try {
+          // Construct the API URL with the correct parameters
+          let city = inputByUser.value;
+          let APIKey = "583f12d47da75834ae881d573514caec";
+          console.log(city);
+          let response = await fetch(
+            `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${APIKey}`
+          );
+          let data = await response.json();
+          console.log(city);
+
+          render(data);
+        } catch {
+          console.log("Please enter a valid place");
+        }
+      };
+
+      //displaying the results in UI
+
+      async function render(data) {
+        try {
+          // Extract temperature from the first forecast entry
+          let temperature = data.list[0].main.temp;
+
+          // Convert temperature to Celsius
+          let temperatureCelsius = temperature - 273.15;
+
+          // Inserting data to Para
+          searchWheatherDetailsPara.textContent = `${temperatureCelsius.toFixed(
+            2
+          )} °C`;
+          //Fetching data of sunrise and sunset from API
+          let sunriseFetch = data["city"]["sunrise"];
+
+          //converting the time stamp to miliseconds
+          sunriseMilisecondsTime = sunriseFetch * 1000;
+
+          let sunriseDate = new Date(sunriseMilisecondsTime);
+
+          // Specifying options to customize the time format
+          let options = { hour: "numeric", minute: "numeric", hour12: true };
+
+          // Converting the Date object to a string in 12-hour time format without seconds
+          let sunriseTime = sunriseDate.toLocaleTimeString("en-US", options);
+          // Inserting sunrise time in button
+          sunriseTimeBtn.textContent = ` Sunrise > ${sunriseTime}`;
+          sunriseTimeDiv.classList.remove("hidden");
+          sunriseTimeDiv.classList.add("flex");
+
+          //Now setting sunset time
+
+          let sunsetFetch = data["city"]["sunset"];
+
+          //converting the time stamp to miliseconds
+          sunsetMilisecondsTime = sunsetFetch * 1000;
+
+          let sunsetDate = new Date(sunsetMilisecondsTime);
+
+          // Specifying options to customize the time format
+          let optionsOfSunset = {
+            hour: "numeric",
+            minute: "numeric",
+            hour12: true,
+          };
+
+          // Converting the Date object to a string in 12-hour time format without seconds
+          let sunsetTime = sunsetDate.toLocaleTimeString("en-US", options);
+          // Inserting sunset time in button
+          sunsetTimeBtn.textContent = ` Sunset > ${sunsetTime}`;
+          sunsetTimeDiv.classList.remove("hidden");
+          sunsetTimeDiv.classList.add("flex");
+
+          windInfo(data);
+
+          humidityInfo(data);
+
+          pressureInfo(data);
+
+          weatherConditionInfo(data);
+        } catch (error) {
+          console.error("Error fetching weather data:", error);
+        }
+      }
+
+      searchBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        fetchDetails();
+        fetchLatLong();
+      });
+
+      // lets extract wind speed
+
+      async function windInfo(data) {
+        let windSpeed = await data.list[4].wind.speed;
+        console.log(windSpeed);
+
+        // converting meters per second to km per hour
+
+        let speedKmPerHour = Math.floor(windSpeed * 3.6);
+        console.log(speedKmPerHour);
+
+        //showing windSpeed in UI
+
+        windPara.textContent = ` Speed : ${speedKmPerHour} km/h`;
+        windDetails.classList.remove("hidden");
+        windDetails.classList.add("flex");
+      }
+
+      // lets extract humidity details
+
+      function humidityInfo(data) {
+        let humidity = data.list[1].main.humidity;
+
+        //showing in UI
+
+        humidityPara.textContent = ` Humidity : ${humidity} %`;
+        humidityDetails.classList.remove("hidden");
+        humidityDetails.classList.add("flex");
+      }
+
+      //lets extract pressure details
+
+      function pressureInfo(data) {
+        let airPressure = data.list[1].main.pressure;
+
+        // showing in UI
+
+        pressurePara.textContent = ` Pressure : ${airPressure} hPa`;
+        pressureDetails.classList.remove("hidden");
+        pressureDetails.classList.add("flex");
+      }
+
+      //lets extract condition details like clear,rainy etc
+
+      function weatherConditionInfo(data) {
+        let weatherCondition = data.list[2].weather[0].description;
+
+        //showing in UI
+
+        conditionPara.textContent = weatherCondition;
+      }
+
+      async function fetchLatLong() {
+        let city = inputByUser.value;
+
+        //calling Api to fetch lat & long
+
+        let response = await fetch(
+          `http://api.openweathermap.org/geo/1.0/direct?q=${city},IN&limit=0&appid=583f12d47da75834ae881d573514caec`
+        );
+        let jsonResponse = await response.json();
+
+        let latitude = jsonResponse[0].lat;
+        let longitude = jsonResponse[0].lon;
+        console.log(latitude, longitude);
+
+        fetchHourlyWeather(latitude, longitude);
+      }
+
+      async function fetchHourlyWeather(latitude, longitude) {
+        let daysResponse = await fetch(
+          `api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=583f12d47da75834ae881d573514caec`
+        );
+
+        let daysData = await daysResponse.json();
+        console.log(daysData);
+      }
+
+      // async function getDataFromAPI() {
+      //   try {
+      //     let latitude = 17.6333;
+      //     let longitude = 18.3333;
+      //     let APIKey = "0b14062798f3a1b93b1b1c0d27900d7a";
+      //     let data = await fetch(
+      //       `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${APIKey}`
+      //     );
+      //     let jsonData = await data.json();
+      //     console.log(jsonData);
+      //   } catch {
+      //     console.log("Enter a valid value");
+      //   }
+      // }
+      // getDataFromAPI();
+
+      // async function getDataFromAPI() {
+      //   const { latitude, longitude } = data.results[0].geometry.location;
+      //   console.log(latitude, longitude);
+
+      //   let APIKey = "0b14062798f3a1b93b1b1c0d27900d7a";
+      //   let data = await fetch(
+      //     `https://pro.openweathermap.org/data/2.5/forecast/hourly?lat={lat}&lon={lon}&appid={API key}`
+      //   );
+      //   let jsonData = await data.json();
+      //   console.log(jsonData);
+
+      //   console.log("Enter a valid value");
+      // }
+
+      // getDataFromAPI();
+    </script>
+  </body>
+</html>
